@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Safe Send</title>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </head>
+    <body>
+        <form id="form" onsubmit="submitData(event)">
+            <input type="hidden" name="data" value="{{ data }}">
+            <input type="text" name="password" placeholder="password">
+            <input type="submit" value="Submit">
+        </form>
+        <label id="decrypted-data-label" for="decrypted-data"></label>
+        <p id="decrypted-data"></p>
+    </body>
+    <script src="{{ url_for('static', filename='crypto.js') }}"></script>
+    <script>
+        async function submitData(event) {
+            event.preventDefault();
+
+            var form = document.getElementById("form")
+            var password = form.elements["password"].value
+            var data = form.elements["data"].value
+
+            try {
+                var decrypted = await decrypt(fromJson(data), password)
+
+                document.getElementById("decrypted-data").textContent = decrypted
+            }
+            catch (e) {
+                document.getElementById("decrypted-data").textContent = "Incorrect Password"
+            }
+        }
+    </script>
+</html>

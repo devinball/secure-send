@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Safe Send</title>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </head>
+    <body>
+        <form id="form" onsubmit="submitData(event)">
+            <input type="text" name="raw-text" placeholder="content">
+            <input type="text" name="password" placeholder="password">
+            <input type="submit" value="Submit">
+        </form>
+        <a id="result-link"></a>
+    </body>
+    <script src="{{ url_for('static', filename='crypto.js') }}"></script>
+    <script>
+        async function submitData(event) {
+            event.preventDefault();
+
+            var form = document.getElementById("form")
+            var data = form.elements["raw-text"].value
+            var password = form.elements["password"].value
+
+            var encrypted = await encrypt(data, password)
+
+            var json = toJson(encrypted);
+
+            var res = await fetch("/create", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: json
+            })
+
+            var res_json = await res.json()
+
+            console.log(res_json["data_id"])
+            
+            var anchor = document.getElementById("result-link")
+            anchor.href = `/retrieve/${res_json["data_id"]}`
+            anchor.textContent = `/retrieve/${res_json["data_id"]}`
+        }
+    </script>
+</html>
